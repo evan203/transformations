@@ -2,8 +2,8 @@
 const vector_i_input = document.getElementById('vector-i');
 const vector_j_input = document.getElementById('vector-j');
 
-vector_i_input.addEventListener('input', drawContent); 
-vector_j_input.addEventListener('input', drawContent); 
+vector_i_input.addEventListener('input', drawContent);
+vector_j_input.addEventListener('input', drawContent);
 
 // matrix components
 const mat1Input = document.getElementById('mat1');
@@ -16,6 +16,13 @@ mat2Input.addEventListener('input', drawContent);
 mat3Input.addEventListener('input', drawContent);
 mat4Input.addEventListener('input', drawContent);
 
+// radio buttons for object selection
+const vectorRadio = document.querySelector('input[value="vector"]');
+const starRadio = document.querySelector('input[value="star"]');
+
+vectorRadio.addEventListener('change', drawContent);
+starRadio.addEventListener('change', drawContent);
+
 // canvas
 const canvas = document.querySelector('canvas');
 const parent = canvas.parentNode;
@@ -23,6 +30,60 @@ const leftSpan = document.getElementById('leftSpan');
 const ctx = canvas.getContext('2d');
 
 const unitsAroundOrigin = 10;
+const transparency = 0.7; // Adjust this value (0 to 1) for desired transparency
+
+function transformPoint(x, y, mat1, mat2, mat3, mat4) {
+  const transformedX = mat1 * x + mat2 * y;
+  const transformedY = mat3 * x + mat4 * y;
+  return { x: transformedX, y: transformedY };
+}
+
+function drawStar(ctx, centerX, centerY, outerRadius, innerRadius, points, unitScale, mat1, mat2, mat3, mat4, color) {
+  let rot = Math.PI / 2 * 3;
+  const step = Math.PI / points;
+  const originalPoints = [];
+  const transformedPoints = [];
+
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = transparency; // Apply transparency
+
+  ctx.beginPath();
+  // Calculate and store original points
+  for (let i = 0; i < points; i++) {
+    let outerX = Math.cos(rot) * outerRadius;
+    let outerY = Math.sin(rot) * outerRadius;
+    originalPoints.push({ x: outerX, y: outerY });
+    rot += step;
+
+    let innerX = Math.cos(rot) * innerRadius;
+    let innerY = Math.sin(rot) * innerRadius;
+    originalPoints.push({ x: innerX, y: innerY });
+    rot += step;
+  }
+  // Close the star
+  originalPoints.push(originalPoints[0]);
+
+  // Calculate and draw the transformed star
+  for (let i = 0; i < originalPoints.length; i++) {
+    const originalPoint = originalPoints[i];
+    const transformed = transformPoint(originalPoint.x, originalPoint.y, mat1, mat2, mat3, mat4);
+    transformedPoints.push(transformed);
+    const canvasX = centerX + transformed.x * unitScale;
+    const canvasY = centerY - transformed.y * unitScale; // Remember canvas Y is inverted
+
+    if (i === 0) {
+      ctx.moveTo(canvasX, canvasY);
+    } else {
+      ctx.lineTo(canvasX, canvasY);
+    }
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.globalAlpha = 1; // Reset transparency for other elements
+}
 
 function drawContent() {
   const width = canvas.width;
@@ -79,36 +140,50 @@ function drawContent() {
   ctx.lineTo(scaledOriginX, height);
   ctx.stroke();
 
-  // get the vector components
-  const vector_i = parseFloat(vector_i_input.value);
-  const vector_j = parseFloat(vector_j_input.value);
+  const objectType = document.querySelector('input[name="object"]:checked').value;
 
-  // Draw vector
-  ctx.strokeStyle = 'red';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(scaledOriginX, scaledOriginY); // Start at the origin
-  ctx.lineTo(scaledOriginX + vector_i * unitScale, scaledOriginY - vector_j * unitScale); // End point
-  ctx.stroke();
-
-
-  // Get the transformation matrix values from the input fields
+  // Get the transformation matrix values
   const mat1 = parseFloat(mat1Input.value);
   const mat2 = parseFloat(mat2Input.value);
   const mat3 = parseFloat(mat3Input.value);
   const mat4 = parseFloat(mat4Input.value);
 
-  // Apply the transformation matrix to the input vector (matrix multiplication)
-  const transformed_i = mat1 * vector_i + mat2 * vector_j;
-  const transformed_j = mat3 * vector_i + mat4 * vector_j;
+  if (objectType === 'vector') {
+    // get the vector components
+    const vector_i = parseFloat(vector_i_input.value);
+    const vector_j = parseFloat(vector_j_input.value);
 
-  // Draw the transformed vector (blue)
-  ctx.strokeStyle = 'blue';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(scaledOriginX, scaledOriginY); // Start at the origin
-  ctx.lineTo(scaledOriginX + transformed_i * unitScale, scaledOriginY - transformed_j * unitScale); // End point
-  ctx.stroke();
+    // Draw vector with transparency
+    ctx.strokeStyle = `rgba(255, 0, 0, ${transparency})`; // Red with transparency
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(scaledOriginX, scaledOriginY); // Start at the origin
+    ctx.lineTo(scaledOriginX + vector_i * unitScale, scaledOriginY - vector_j * unitScale); // End point
+    ctx.stroke();
+
+    // Apply the transformation matrix to the input vector
+    const transformed_i = mat1 * vector_i + mat2 * vector_j;
+    const transformed_j = mat3 * vector_i + mat4 * vector_j;
+
+    // Draw the transformed vector with transparency
+    ctx.strokeStyle = `rgba(0, 0, 255, ${transparency})`; // Blue with transparency
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(scaledOriginX, scaledOriginY); // Start at the origin
+    ctx.lineTo(scaledOriginX + transformed_i * unitScale, scaledOriginY - transformed_j * unitScale); // End point
+    ctx.stroke();
+  } else if (objectType === 'star') {
+    const starSize = 0.1; // Adjust for desired size relative to the grid
+    const outerRadius = 0.8 * starSize;
+    const innerRadius = 0.4 * starSize;
+    const points = 5;
+
+    // Draw the original star (red) with transparency
+    drawStar(ctx, scaledOriginX, scaledOriginY, outerRadius * unitScale, innerRadius * unitScale, points, unitScale, 1, 0, 0, 1, `rgba(255, 0, 0, ${transparency})`);
+
+    // Draw the transformed star (blue) with transparency
+    drawStar(ctx, scaledOriginX, scaledOriginY, outerRadius * unitScale, innerRadius * unitScale, points, unitScale, mat1, mat2, mat3, mat4, `rgba(0, 0, 255, ${transparency})`);
+  }
 
   // Add labels for the axes
   ctx.fillStyle = 'black';
@@ -138,11 +213,10 @@ function drawContent() {
 
 function resizeCanvas() {
   canvas.width = parent.clientWidth - leftSpan.clientWidth;
-  canvas.height = 0.9*parent.clientHeight;
+  canvas.height = 0.9 * parent.clientHeight;
   drawContent();
 }
 
 resizeCanvas();
 
 window.addEventListener('resize', resizeCanvas);
-

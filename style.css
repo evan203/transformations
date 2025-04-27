@@ -105,7 +105,8 @@ input[type="number"] {
 }
 
 .bracket {
-  font-size: 3rem; 
+  font-size: 4rem; 
+  font-weight: 200;
   font-family: 'serif'; 
   margin: 0 5px;       
 }
