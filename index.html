@@ -47,9 +47,54 @@
           </div>
           <span class="bracket">]</span>
         </div>
+
+        <h3>Apply Transformations</h3>
+        <div>
+          <input type="button" value="Reset to identity matrix" id="resetID">
+        </div>
+        <div>
+          <input type="button" value="Rotate" id="rotate">
+          <input type="number" id="rotDegrees" value="90">
+          degrees
+        </div>
+        <div>
+          <input type="button" value="Reflect across the x axis" id="reflX">
+        </div>
+        <div>
+          <input type="button" value="Reflect across the y axis" id="reflY">
+        </div>
+        <div>
+          <input type="button" value="Scale in x direction" id="scaleX">
+          by
+          <input type="number" id="scaleFactorX" value="2">
+        </div>
+        <div>
+          <input type="button" value="Scale in y direction" id="scaleY">
+          by
+          <input type="number" id="scaleFactorY" value="2">
+        </div>
       </span>
 
       <canvas></canvas>
+    </div>
+    <div class="writeup">
+      <h2>What is a linear map?</h2>
+      <p>A linear map is a function that maps from one vector space to another
+        that preserves both vector addition and scalar multiplication. That is: </p>
+      <ol>
+        <li>f(u + v) = f(u) + f(v)</li>
+        <li>f(cu) = cf(u)</li>
+      </ol>
+      <h2>What is this visualizer doing?</h2>
+      <p>Consider a linear transformation that maps from R^2 to R^2 defined as
+        T(x)=Ax, where A is a nxn matrix of real numbers. Our input to this
+        function, x, is some vector. Then, we take some object that we wish to
+        transform (i.e. a vector starting at the origin or a star) and apply T
+        to every point on the object. </p>
+      <h2>Why?</h2>
+      <p>Visualizing the result of some vector applied to a matrix is 
+        fascinating, but one may wonder what the purpose is? Why do we need to,
+        for example, reflect some object across the x axis?</p>
     </div>
   </body>
 </html>

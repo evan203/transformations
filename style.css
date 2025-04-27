@@ -62,9 +62,15 @@ a {
   grid-template-columns: fit-content(20ch) minmax(min(50vw, 30ch), 1fr);
   height: 100vh;
 }
+
 span {
   font-size: 1.15rem;
   text-align: left;
+}
+
+#leftSpan {
+  overflow-y: auto;
+  width: 28ch;
 }
 
 canvas {
@@ -89,6 +95,7 @@ input[type="number"] {
   grid-template-rows: repeat(2, 1.5em);
   border-radius: 5px;
 }
+
 .matrix-wrapper {
   display: flex;
   align-items: center;
@@ -108,5 +115,18 @@ input[type="number"] {
   font-size: 4rem; 
   font-weight: 200;
   font-family: 'serif'; 
-  margin: 0 5px;       
+  margin: 0 5px;
+  display: flex;
+  align-items: center;
+}
+
+.matrix-wrapper > p {
+  display: flex; 
+  align-items: center; 
+  margin: 0; 
+}
+
+.writeup {
+  max-width: 75ch;
+  text-align: left;
 }
