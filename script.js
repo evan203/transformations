@@ -25,7 +25,73 @@ starRadio.addEventListener('change', drawContent);
 
 // range input for sliding between un-transformed and transformed
 const transformScaleInput = document.getElementById('transformScale');
-transformScaleInput.addEventListener('change', drawContent);
+transformScaleInput.addEventListener('input', drawContent);
+
+// reset to identity matrix
+const resetIDInput = document.getElementById('resetID');
+resetIDInput.addEventListener('click', function() {
+  mat1Input.value = 1;
+  mat2Input.value = 0;
+  mat3Input.value = 0;
+  mat4Input.value = 1;
+  drawContent();
+})
+
+// rotate current matrix by a certain amount of degrees
+const rotButton = document.getElementById('rotate');
+const rotDegrees= document.getElementById('rotDegrees');
+rotButton.addEventListener('click', function() {
+  const rad = parseFloat(rotDegrees.value) * Math.PI / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+
+  const a = parseFloat(mat1Input.value);
+  const b = parseFloat(mat2Input.value);
+  const c = parseFloat(mat3Input.value);
+  const d = parseFloat(mat4Input.value);
+
+  mat1Input.value = a * cos - c * sin; 
+  mat2Input.value = b * cos - d * sin; 
+  mat3Input.value = a * sin + c * cos; 
+  mat4Input.value = b * sin + d * cos; 
+
+  drawContent();
+})
+
+// reflection across the x axis
+const reflX = document.getElementById('reflX');
+reflX.addEventListener('click', function() {
+  mat3Input.value *= -1;
+  mat4Input.value *= -1;
+  drawContent();
+});
+
+// reflection across the y axis
+const reflY = document.getElementById('reflY');
+reflY.addEventListener('click', function() {
+  mat1Input.value *= -1;
+  mat2Input.value *= -1;
+  drawContent();
+});
+
+const scaleX = document.getElementById('scaleX');
+const scaleFactorX= document.getElementById('scaleFactorX');
+scaleX.addEventListener('click', function() {
+  s = parseFloat(scaleFactorX.value);
+  mat1Input.value *= s;
+  mat2Input.value *= s;
+  drawContent();
+})
+
+const scaleY = document.getElementById('scaleY');
+const scaleFactorY= document.getElementById('scaleFactorY');
+scaleY.addEventListener('click', function() {
+  s = parseFloat(scaleFactorY.value);
+  mat3Input.value *= s;
+  mat4Input.value *= s;
+  drawContent();
+})
+
 
 // canvas
 const canvas = document.querySelector('canvas');
