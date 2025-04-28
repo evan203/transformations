@@ -23,6 +23,10 @@ const starRadio = document.querySelector('input[value="star"]');
 vectorRadio.addEventListener('change', drawContent);
 starRadio.addEventListener('change', drawContent);
 
+// range input for sliding between un-transformed and transformed
+const transformScaleInput = document.getElementById('transformScale');
+transformScaleInput.addEventListener('change', drawContent);
+
 // canvas
 const canvas = document.querySelector('canvas');
 const parent = canvas.parentNode;
@@ -32,10 +36,13 @@ const ctx = canvas.getContext('2d');
 const unitsAroundOrigin = 10;
 const transparency = 0.7; // Adjust this value (0 to 1) for desired transparency
 
-function transformPoint(x, y, mat1, mat2, mat3, mat4) {
+function transformPoint(x, y, mat1, mat2, mat3, mat4, scale) {
   const transformedX = mat1 * x + mat2 * y;
   const transformedY = mat3 * x + mat4 * y;
-  return { x: transformedX, y: transformedY };
+  const scaledX = x + (transformedX - x) * scale;
+  const scaledY = y + (transformedY - y) * scale;
+
+  return { x: scaledX, y: scaledY };
 }
 
 function drawStar(ctx, centerX, centerY, outerRadius, innerRadius, points, unitScale, mat1, mat2, mat3, mat4, color) {
@@ -68,7 +75,7 @@ function drawStar(ctx, centerX, centerY, outerRadius, innerRadius, points, unitS
   // Calculate and draw the transformed star
   for (let i = 0; i < originalPoints.length; i++) {
     const originalPoint = originalPoints[i];
-    const transformed = transformPoint(originalPoint.x, originalPoint.y, mat1, mat2, mat3, mat4);
+    const transformed = transformPoint(originalPoint.x, originalPoint.y, mat1, mat2, mat3, mat4, transformScaleInput.value);
     transformedPoints.push(transformed);
     const canvasX = centerX + transformed.x * unitScale;
     const canvasY = centerY - transformed.y * unitScale; // Remember canvas Y is inverted
@@ -162,15 +169,14 @@ function drawContent() {
     ctx.stroke();
 
     // Apply the transformation matrix to the input vector
-    const transformed_i = mat1 * vector_i + mat2 * vector_j;
-    const transformed_j = mat3 * vector_i + mat4 * vector_j;
+    const transformed = transformPoint(vector_i, vector_j, mat1, mat2, mat3, mat4, transformScaleInput.value);
 
     // Draw the transformed vector with transparency
     ctx.strokeStyle = `rgba(0, 0, 255, ${transparency})`; // Blue with transparency
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(scaledOriginX, scaledOriginY); // Start at the origin
-    ctx.lineTo(scaledOriginX + transformed_i * unitScale, scaledOriginY - transformed_j * unitScale); // End point
+    ctx.lineTo(scaledOriginX + transformed.x * unitScale, scaledOriginY - transformed.y * unitScale); // End point
     ctx.stroke();
   } else if (objectType === 'star') {
     const starSize = 0.1; // Adjust for desired size relative to the grid

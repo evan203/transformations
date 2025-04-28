@@ -130,3 +130,15 @@ input[type="number"] {
   max-width: 75ch;
   text-align: left;
 }
+
+.red {
+  color: red;
+}
+
+.blue {
+  color: blue;
+}
+
+#transformScale {
+  width: 25ch;
+}
