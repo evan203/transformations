@@ -77,6 +77,7 @@ reflY.addEventListener('click', function() {
   drawContent();
 });
 
+// scale in x and y
 const scaleX = document.getElementById('scaleX');
 const scaleFactorX= document.getElementById('scaleFactorX');
 scaleX.addEventListener('click', function() {
@@ -94,6 +95,25 @@ scaleY.addEventListener('click', function() {
   mat4Input.value *= s;
   drawContent();
 })
+
+// shear/stretch h and v
+const shearH = document.getElementById('shearH');
+const shearFactorH= document.getElementById('shearFactorH');
+shearH.addEventListener('click', function() {
+  s = parseFloat(shearFactorH.value);
+  mat1Input.value = parseFloat(mat1Input.value) + (s * mat3Input.value);
+  mat2Input.value = parseFloat(mat2Input.value) + (s * mat4Input.value);
+  drawContent();
+});
+
+const shearV = document.getElementById('shearV');
+const shearFactorV= document.getElementById('shearFactorV');
+shearV.addEventListener('click', function() {
+  s = parseFloat(shearFactorV.value);
+  mat3Input.value = parseFloat(mat3Input.value) + (s * mat1Input.value);
+  mat4Input.value = parseFloat(mat4Input.value) + (s * mat2Input.value);
+  drawContent();
+});
 
 
 // canvas
@@ -225,7 +245,6 @@ function drawContent() {
   const mat4 = parseFloat(mat4Input.value);
 
   det.textContent = ((mat1*mat4)-(mat2*mat3)) ;
-  console.log((mat1*mat4)-(mat2*mat3));
 
   if (objectType === 'vector') {
     // get the vector components
