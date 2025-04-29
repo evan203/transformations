@@ -17,25 +17,35 @@
         <h1>Linear Transformation Visualizer</h1>
         <h2>Object to transform</h2>
         <div>
-        <label>
-          <input type="radio" name="object" value="vector" checked />
-          Vector
           <label>
-            <
-            <input type="number" id="vector-i" value="1" />
-            , 
+            Start point: (
+            <input type="number" id="startX" value="0" />
+            ,
+          </label> <label>
+            <input type="number" id="startY" value="0" />
+            )
           </label>
-          <label>
-            <input type="number" id="vector-j" value="1" />
-            > 
-          </label>
-        </label>
         </div>
         <div>
-        <label>
-          <input type="radio" name="object" value="star" />
-          Star
-        </label>
+          <label>
+            <input type="radio" name="object" value="vector" checked />
+            Vector
+            <label>
+              <
+              <input type="number" id="vector-i" value="1" />
+              , 
+            </label>
+            <label>
+              <input type="number" id="vector-j" value="1" />
+              > 
+            </label>
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="radio" name="object" value="star" />
+            Star
+          </label>
         </div>
         <h2>Transformation Matrix</h2>
         <p>\(T(\mathbf{x}) = A\mathbf{x}\)</p>

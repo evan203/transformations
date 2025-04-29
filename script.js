@@ -5,6 +5,13 @@ const vector_j_input = document.getElementById('vector-j');
 vector_i_input.addEventListener('input', drawContent);
 vector_j_input.addEventListener('input', drawContent);
 
+
+// start point
+const startX = document.getElementById('startX');
+const startY = document.getElementById('startY');
+startX.addEventListener('input', drawContent); 
+startY.addEventListener('input', drawContent); 
+
 // matrix components
 const mat1Input = document.getElementById('mat1');
 const mat2Input = document.getElementById('mat2');
@@ -134,7 +141,7 @@ function transformPoint(x, y, mat1, mat2, mat3, mat4, scale) {
   return { x: scaledX, y: scaledY };
 }
 
-function drawStar(ctx, centerX, centerY, outerRadius, innerRadius, points, unitScale, mat1, mat2, mat3, mat4, color) {
+function drawStar(ctx, centerX, centerY, outerRadius, innerRadius, points, unitScale, mat1, mat2, mat3, mat4, color, startX, startY) {
   let rot = Math.PI / 2 * 3;
   const step = Math.PI / points;
   const originalPoints = [];
@@ -166,8 +173,8 @@ function drawStar(ctx, centerX, centerY, outerRadius, innerRadius, points, unitS
     const originalPoint = originalPoints[i];
     const transformed = transformPoint(originalPoint.x, originalPoint.y, mat1, mat2, mat3, mat4, transformScaleInput.value);
     transformedPoints.push(transformed);
-    const canvasX = centerX + transformed.x * unitScale;
-    const canvasY = centerY - transformed.y * unitScale; // Remember canvas Y is inverted
+    const canvasX = centerX + (transformed.x + parseFloat(startX)) * unitScale;
+    const canvasY = centerY - (transformed.y + parseFloat(startY)) * unitScale; // Remember canvas Y is inverted
 
     if (i === 0) {
       ctx.moveTo(canvasX, canvasY);
@@ -246,6 +253,9 @@ function drawContent() {
 
   det.textContent = ((mat1*mat4)-(mat2*mat3)) ;
 
+  const currentStartX = parseFloat(startX.value) || 0;
+  const currentStartY = parseFloat(startY.value) || 0;
+
   if (objectType === 'vector') {
     // get the vector components
     const vector_i = parseFloat(vector_i_input.value);
@@ -255,19 +265,21 @@ function drawContent() {
     ctx.strokeStyle = `rgba(255, 0, 0, ${transparency})`; // Red with transparency
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(scaledOriginX, scaledOriginY); // Start at the origin
-    ctx.lineTo(scaledOriginX + vector_i * unitScale, scaledOriginY - vector_j * unitScale); // End point
+    ctx.moveTo(scaledOriginX + currentStartX * unitScale, scaledOriginY - currentStartY * unitScale); // Start at the translated origin
+    ctx.lineTo(scaledOriginX + (vector_i + currentStartX) * unitScale, scaledOriginY - (vector_j + currentStartY) * unitScale); // End point
     ctx.stroke();
 
-    // Apply the transformation matrix to the input vector
-    const transformed = transformPoint(vector_i, vector_j, mat1, mat2, mat3, mat4, transformScaleInput.value);
+    // Apply the transformation to the start point
+    const transformedStart = transformPoint(currentStartX, currentStartY, mat1, mat2, mat3, mat4, transformScaleInput.value);
+    // Apply the transformation matrix to the end point of the vector
+    const transformedEnd = transformPoint(vector_i + currentStartX, vector_j + currentStartY, mat1, mat2, mat3, mat4, transformScaleInput.value);
 
     // Draw the transformed vector with transparency
     ctx.strokeStyle = `rgba(0, 0, 255, ${transparency})`; // Blue with transparency
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(scaledOriginX, scaledOriginY); // Start at the origin
-    ctx.lineTo(scaledOriginX + transformed.x * unitScale, scaledOriginY - transformed.y * unitScale); // End point
+    ctx.moveTo(scaledOriginX + transformedStart.x * unitScale, scaledOriginY - transformedStart.y * unitScale); // Transformed start
+    ctx.lineTo(scaledOriginX + transformedEnd.x * unitScale, scaledOriginY - transformedEnd.y * unitScale); // Transformed end
     ctx.stroke();
   } else if (objectType === 'star') {
     const starSize = 0.1; // Adjust for desired size relative to the grid
@@ -275,11 +287,14 @@ function drawContent() {
     const innerRadius = 0.4 * starSize;
     const points = 5;
 
-    // Draw the original star (red) with transparency
-    drawStar(ctx, scaledOriginX, scaledOriginY, outerRadius * unitScale, innerRadius * unitScale, points, unitScale, 1, 0, 0, 1, `rgba(255, 0, 0, ${transparency})`);
+    // Apply the transformation to the star's center point
+    const transformedCenter = transformPoint(currentStartX, currentStartY, mat1, mat2, mat3, mat4, transformScaleInput.value);
 
-    // Draw the transformed star (blue) with transparency
-    drawStar(ctx, scaledOriginX, scaledOriginY, outerRadius * unitScale, innerRadius * unitScale, points, unitScale, mat1, mat2, mat3, mat4, `rgba(0, 0, 255, ${transparency})`);
+    // Draw the original star (red)
+    drawStar(ctx, scaledOriginX + currentStartX * unitScale, scaledOriginY - currentStartY * unitScale, outerRadius * unitScale, innerRadius * unitScale, points, unitScale, 1, 0, 0, 1, `rgba(255, 0, 0, ${transparency})`, 0, 0);
+
+    // Draw the transformed star (blue)
+    drawStar(ctx, scaledOriginX + transformedCenter.x * unitScale, scaledOriginY - transformedCenter.y * unitScale, outerRadius * unitScale, innerRadius * unitScale, points, unitScale, mat1, mat2, mat3, mat4, `rgba(0, 0, 255, ${transparency})`, 0, 0);
   }
 
   // Add labels for the axes
