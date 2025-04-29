@@ -7,6 +7,8 @@
     <meta name="darkreader-lock">
     <link rel="stylesheet" href="style.css">
     <script defer type="text/javascript" src="script.js"></script>
+    <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <title>Linear Transformations</title>
   </head>
   <body>
@@ -36,9 +38,9 @@
         </label>
         </div>
         <h2>Transformation Matrix</h2>
-        <p>T(x) = Ax</p>
+        <p>\(T(\mathbf{x}) = A\mathbf{x}\)</p>
         <div class="matrix-wrapper">
-          <p>A=</p><span class="bracket">[</span>
+          <p>\(A=\)</p><span class="bracket">[</span>
           <div class="matrix-container">
             <input type="number" class="matrix-input" id="mat1" value="1">
             <input type="number" class="matrix-input" id="mat2" value="0">
@@ -47,6 +49,10 @@
           </div>
           <span class="bracket">]</span>
         </div>
+        <p>
+          \(det(A) = \)  
+          <span id="det">1</span>
+        </p>
 
         <h3>Apply Transformations</h3>
         <div>
@@ -78,6 +84,16 @@
           by
           <input type="number" id="scaleFactorY" value="2">
         </div>
+        <div>
+          <input type="button" value="Shear/stretch horizontally" id="shearH">
+          by
+          <input type="number" id="shearFactorH" value="2">
+        </div>
+        <div>
+          <input type="button" value="Shear/stretch vertically" id="shearV">
+          by
+          <input type="number" id="shearFactorV" value="2">
+        </div>
       </span>
 
       <canvas></canvas>
@@ -87,21 +103,105 @@
       <p>A linear map is a function that maps from one vector space to another
         that preserves both vector addition and scalar multiplication. That is: </p>
       <ol>
-        <li>f(u + v) = f(u) + f(v)</li>
-        <li>f(cu) = cf(u)</li>
+        <li>\(f(\mathbf{u} + \mathbf{v}) = f(\mathbf{u}) + f(\mathbf{v})\)</li>
+        <li>\(f(c\mathbf{u}) = cf(\mathbf{u})\)</li>
       </ol>
       <h2>What is this visualizer doing?</h2>
-      <p>Consider a linear transformation that maps from R^2 to R^2 defined as
-        T(x)=Ax, where A is a nxn matrix of real numbers. Our input to this
-        function, x, is some vector. Then, we take some object that we wish to
+      <p>Consider a linear transformation that maps \(\mathbb{R}^2 \rightarrow 
+        \mathbb{R}^2\) defined as \(T(\mathbf{x})=A\mathbf{x}\), where 
+        \(A \in \mathbb{R}^{2 \times 2}\) and \(\mathbf{x} \in \mathbb{R}^2 \). 
+        Then, we take some object that we wish to
         transform (i.e. a vector starting at the origin or a star) and apply T
         to every point on the object. </p>
       <h2>Why?</h2>
       <p>Visualizing the result of some vector applied to a matrix is 
         fascinating, but one may wonder what the purpose is? Why do we need to,
-        for example, reflect some object across the x axis?</p>
+        for example, reflect some object across the x axis? Let's look at a few
+        applicaitons of transformation matrices. </p>
+      <br>
+      <ol> 
+        <li><h4>Computer Graphics and Gaming</h4>
+          <ul>
+            <li>
+              Object Manipulation: Translating (moving), rotating, scaling, 
+              and shearing objects in 2D and 3D scenes. Think about moving 
+              your game character, resizing a window, or rotating a 3D model 
+              to view it from different angles.
+            </li>
+            <li>
+              Camera Transformations: Defining the position, orientation, 
+              and perspective of a virtual camera. This allows you to "look" 
+              at a scene from different viewpoints and create effects like 
+              zooming and panning.
+            </li>
+          </ul>
+        </li>
+        <li><h4>Image Processing and Computer Vision </h4>
+          <ul>
+            <li>
+              Image Registration: Aligning multiple images of the same scene 
+              taken at different times, from different viewpoints, or with 
+              different sensors. Transformations are used to warp one image 
+              to match another.
+            </li>
+            <li>
+              Image Warping and Morphing: Distorting images for artistic 
+              effects or to correct geometric distortions. Image morphing 
+              involves smoothly transitioning between two images using a 
+              series of transformations.   
+            </li>
+            <li>
+              Feature Extraction: In some computer vision tasks, 
+              transformations can be used to make features more apparent 
+              or invariant to certain changes in viewpoint or scale.
+            </li>
+          </ul>
+        </li>
+        <li><h4>Geographic Information Systems (GIS)</h4>
+          <ul>
+            <li>
+              Map Projections: Transforming coordinates from the Earth's 
+              curved surface onto a flat map. Different projections use 
+              different mathematical transformations.   
+            </li>
+            <li>
+              Spatial Analysis: Performing operations like calculating 
+              distances, areas, and overlaps between geographic features, 
+              often involving transformations between coordinate systems.
+            </li>
+          </ul>
+        </li>
+      </ol>
       <h2>Composing Transformations</h2>
       <h4>Rotate</h4>
+      <p>To apply a rotation of \(\theta\) degrees counter clockwise to a 2x2
+        matrix A, we use the rotation matrix: \[R(\theta) = \begin{bmatrix} 
+        cos(\theta) & -sin(\theta)\\
+        sin(\theta) & cos(\theta) \end{bmatrix} \]
+        Note that we left-multiply A by \(R(\theta)\). That is, 
+        \[A_{rotated} = R(\theta)A \]
+      <p>
+      <h4>Scaling and Axis Reflection</h4>
+      <p>To scale a 2x2 matrix A in the x-direction by a factor of \(s_x\) and
+        in the y-direction by a factor of \(s_y\), we use the scaling matrix: 
+        \[S = \begin{bmatrix} s_x & 0\\ 0 & s_y \end{bmatrix} \]
+        That is, \[A_{scaled} = SA\]
+        To reflect across the x axis, we use \((s_x, s_y) = (1, -1)\). To
+        reflect across the y-axis, we use \((s_x, s_y) = (-1, 1)\).
+      </p>
+      <br>
+      <h4>Horizontal Shear/Stretch</h4>
+      <p>This is shifting points horizontally by an amount proportional to their
+        y-coordinate. To horizontally shear or stretch a 2x2 matrix A by a factor
+        \(k\), we use the matrix: \[H = \begin{bmatrix} 1 & k\\ 0 & 1 
+        \end{bmatrix} \] That is, \[A_{H} = HA\]
+      </p>
+      <h4>Vertical Shear/Stretch</h4>
+      <p>This is shifting points vertically by an amount proportional to their
+        x-coordinate. To vertically shear or stretch a 2x2 matrix A by a factor
+        \(k\), we use the matrix: \[V = \begin{bmatrix} 1 & 0\\ k & 1 
+        \end{bmatrix} \] That is, \[A_{V} = VA\]
+      </p>
     </div>
   </body>
 </html>

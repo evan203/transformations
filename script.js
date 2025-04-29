@@ -27,6 +27,9 @@ starRadio.addEventListener('change', drawContent);
 const transformScaleInput = document.getElementById('transformScale');
 transformScaleInput.addEventListener('input', drawContent);
 
+// determinant display
+const det = document.getElementById('det');
+
 // reset to identity matrix
 const resetIDInput = document.getElementById('resetID');
 resetIDInput.addEventListener('click', function() {
@@ -220,6 +223,9 @@ function drawContent() {
   const mat2 = parseFloat(mat2Input.value);
   const mat3 = parseFloat(mat3Input.value);
   const mat4 = parseFloat(mat4Input.value);
+
+  det.textContent = ((mat1*mat4)-(mat2*mat3)) ;
+  console.log((mat1*mat4)-(mat2*mat3));
 
   if (objectType === 'vector') {
     // get the vector components
